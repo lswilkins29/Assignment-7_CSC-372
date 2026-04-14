@@ -1,121 +1,70 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
+import PlayerThrow from './PlayerThrow';
+import ComputerThrow from './ComputerThrow';
+import ResultDisplay from './ResultDisplay';
+import ScoreBoard from './ScoreBoard';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [playerChoice, setPlayerChoice] = useState(null);
+  const [computerChoice, setComputerChoice] = useState(null);
+  const [outcome, setOutcome] = useState(null);
+  const [scores, setScores] = useState({ wins: 0, losses: 0, ties: 0 });
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const getRandomThrow = () => {
+    const throws = ['rock', 'paper', 'scissors'];
+    return throws[Math.floor(Math.random() * 3)];
+  };
+
+  const determineWinner = (player, computer) => {
+    if (player === computer) return 'tie';
+    if (
+      (player === 'rock' && computer === 'scissors') ||
+      (player === 'scissors' && computer === 'paper') ||
+      (player === 'paper' && computer === 'rock')
+    ) {
+      return 'win';
+    }
+    return 'lose';
+  };
+
+  const handlePlayerSelect = (throwType) => {
+    if (isAnimating) return; // Prevent selection during animation
+    setPlayerChoice(throwType);
+    setIsAnimating(true);
+    setOutcome(null);
+
+    setTimeout(() => {
+      const compChoice = getRandomThrow();
+      setComputerChoice(compChoice);
+      const result = determineWinner(throwType, compChoice);
+      setOutcome(result);
+      setScores(prev => ({
+        ...prev,
+        [result === 'win' ? 'wins' : result === 'lose' ? 'losses' : 'ties']: prev[result === 'win' ? 'wins' : result === 'lose' ? 'losses' : 'ties'] + 1
+      }));
+      setIsAnimating(false);
+    }, 3000);
+  };
+
+  const resetGame = () => {
+    setPlayerChoice(null);
+    setComputerChoice(null);
+    setOutcome(null);
+    setScores({ wins: 0, losses: 0, ties: 0 });
+    setIsAnimating(false);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className="app">
+      <h1>Rock-Paper-Scissors</h1>
+      <ScoreBoard scores={scores} onReset={resetGame} />
+      <PlayerThrow onSelect={handlePlayerSelect} selected={playerChoice} />
+      <ComputerThrow computerChoice={computerChoice} isAnimating={isAnimating} />
+      <ResultDisplay outcome={outcome} />
+    </div>
+  );
 }
 
-export default App
+export default App;

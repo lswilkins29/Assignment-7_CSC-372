@@ -1,0 +1,10 @@
+.computer-throw {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.throw-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+}

@@ -1,0 +1,21 @@
+.result-display {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.result-message {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.result-message.win {
+  color: green;
+}
+
+.result-message.lose {
+  color: red;
+}
+
+.result-message.tie {
+  color: orange;
+}
